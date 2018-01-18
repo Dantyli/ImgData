@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>imgdata</title>
+</head>
+<style>
+    #toggle,
+    #bw {
+        display: none;
+    }
+</style>
+
+<body>
+    <input type="file" accept="image/*">
+    <p><img src=""></p>
+    <p><input type="button" value="取反" id="toggle">
+        <input type="button" value="黑白" id="bw"></p>
+    <canvas width="300" height="300">your browser do not support canvas</canvas>
+    <script>
+        var fileIm = document.querySelector('input[type=file]');
+        var iimg = document.querySelector('img');
+        var tog = document.querySelector('#toggle');
+        var bw = document.querySelector('#bw');
+        var oC = document.querySelector('canvas');
+        var oCg = oC.getContext('2d');
+        reader = new FileReader();
+        fileIm.addEventListener('change', function(event) {
+            file = event.target.files[0];
+            reader.readAsDataURL(file);
+        });
+        reader.onload = function(e) {
+            iimg.src = e.target.result;
+            tog.style.cssText = 'display:inline-block';
+            bw.style.cssText = 'display:inline-block';
+        };
+        toggle.addEventListener('click', function() {
+            oCg.drawImage(iimg, 0, 0);
+            var imgData = oCg.getImageData(0, 0, iimg.width, iimg.height);
+            data = imgData.data;
+            for (var i = 0; i < data.length; i += 4) {
+                //反色:把每一个像素点的rgb取反
+                data[i] = 255 - data[i];
+                data[i + 1] = 255 - data[i + 1];
+                data[i + 2] = 255 - data[i + 2];
+            }
+            //处理之后再次输出
+            oCg.putImageData(imgData, 0, 0);
+        })
+        bw.addEventListener('click', function() {
+            oCg.drawImage(iimg, 0, 0);
+            var imgData = oCg.getImageData(0, 0, iimg.width, iimg.height);
+            data = imgData.data;
+            for (var i = 0; i < data.length; i += 4) {
+                //黑白效果:rgb的平均值,赋值给rgb
+                avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                data[i] = avg;
+                data[i + 1] = avg;
+                data[i + 2] = avg;
+            }
+            //处理之后再次输出
+            oCg.putImageData(imgData, 0, 0);
+        })
+    </script>
+</body>
+
+</html>
